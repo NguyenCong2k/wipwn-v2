@@ -6,10 +6,17 @@ import json
 import os
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
+
 
 def sessions_dir() -> Path:
     home = Path(os.environ.get("HOME", Path.home()))
-    return home / ".wipwn" / "sessions"
+    preferred = home / ".wipwn" / "sessions"
+    if preferred.exists():
+        return preferred
+    # If a previous root run created ~/.wipwn with restrictive permissions,
+    # fall back to the repo-local directory.
+    return ROOT / ".wipwn" / "sessions"
 
 
 def list_sessions() -> list[dict]:
@@ -17,16 +24,24 @@ def list_sessions() -> list[dict]:
     if not directory.exists():
         return []
     sessions = []
-    for path in sorted(directory.glob("*.run")):
+    try:
+        paths = sorted(directory.glob("*.run"))
+    except PermissionError:
+        return []
+    for path in paths:
         try:
             mask = path.read_text(encoding="utf-8", errors="replace").strip()
         except OSError:
             mask = ""
+        try:
+            size = path.stat().st_size
+        except OSError:
+            size = 0
         sessions.append({
             "file": str(path),
             "bssid": path.stem,
             "mask": mask,
-            "size": path.stat().st_size,
+            "size": size,
         })
     return sessions
 

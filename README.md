@@ -150,6 +150,7 @@ vulnwsc.txt
 |---|---|
 | `wpa_supplicant: not found` | `pkg install wpa-supplicant -y`; chạy qua `wipwn.sh` để có PATH đúng |
 | `Read-only file system: '//.wipwn'` | Chạy qua `wipwn.sh`, hoặc set `HOME` về Termux home |
+| `Permission denied: .../.wipwn/logs` | Thư mục `.wipwn` do root tạo. Chạy `su -c "chown -R $(id -u):$(id -g) /data/data/com.termux/files/home/.wipwn"` rồi thử lại. Bản mới cũng tự fallback sang `logs/` trong repo. |
 | `Permission denied` | `chmod +x wipwn.sh` |
 | Không thấy `wlan0` | `ip link show`; dùng `-i wlan1` nếu cần |
 | Root lỗi | Dùng `su`/`tsu`; `wipwn.sh` không tự leo root |
